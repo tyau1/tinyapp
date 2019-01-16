@@ -7,6 +7,11 @@
 <body>
     <% for (let key in urls) {%>
         <li><%= key %> - <%= urls[key] %></li>
+        <form action="/urls/<%= key %>/delete" method="post">
+        <a href= "/urls/<%= key %>" <button> Edit </button></a>
+        <button>Delete</button>
+        </form>
     <% } %>
+
 </body>
 </html>

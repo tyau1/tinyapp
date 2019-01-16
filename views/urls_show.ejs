@@ -6,11 +6,18 @@
         <% include ./partials/_header %>
     </header>
 </head>
+
 <body>
-    <h1>Short URL Information</h1>
-    <b>ShortURL</b> :  <%=shortUrl %>
+    <b>Short URL</b> :  <%=shortURL %>
     <p></p>
-    <h1>Long URL Information</h1>
-    <b>LongURL </b> : <%=longUrl%>
+    <!-- <b>Long URL </b> : <%=longURL%> -->
+
+    <form action="/urls/<%= shortURL %>" method="post">
+        <!-- <label for="long" URL"> <%= longURL %></label> -->
+        <input size="30" id="longURL" type="text" name="longURL" placeholder="<%= longURL %>">
+    
+        <button>Update</button>
+      </form>
+
 </body>
 </html>
