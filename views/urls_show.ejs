@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <title>TinyApp</title>
-  <header>
+    <title>TinyApp</title>
+    <header>
         <% include ./partials/_header %>
     </header>
 </head>
 
 <body>
-    <b>Short URL</b> :  <%=shortURL %>
+    <b>Short URL</b> :
+    <%=shortURL %>
     <p></p>
-    <!-- <b>Long URL </b> : <%=longURL%> -->
-
     <form action="/urls/<%= shortURL %>" method="post">
-        <!-- <label for="long" URL"> <%= longURL %></label> -->
         <input size="30" id="longURL" type="text" name="longURL" placeholder="<%= longURL %>">
-    
+
         <button>Update</button>
-      </form>
+    </form>
 
 </body>
+
 </html>
