@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>TinyApp</title>
+    <% include ./partials/_header %>
+</head>
+
+<body>
+    <p></p>
+    <a href="http://localhost:8080/urls/new"> Create New Short Link </a>
+    <h1>URL Library</h1>
+    <% for (let key in urls) {%>
+    <li>
+    Short URL: <%= key %> -  Long URL: <%= urls[key].longURL %>
+    </li>
+    <form action="/urls/<%= key %>/delete" method="post">
+        <a href="/urls/<%= key %>" <button> Edit </button></a>
+        <button type="submit">Delete</button>
+        <p></p>
+    </form>
+    <% } %>
+    <p></p>
+
+</body>
+
+</html>
