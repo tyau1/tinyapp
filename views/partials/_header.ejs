@@ -1,16 +1,14 @@
-
-<% if(username) { %>
-    Welcome <%=username%>!
-    <form action="/logout" method="post">
-        
-        <button type="submit"> Logout </button>
-    </form>
+<h4><% if(user) { %>
+Welcome,
+<%= user.email %>!</h4>
+<p></p>
+<form action="/logout" method="post">
+    <button type="submit"> Logout </button>
+</form>
 
 <% } else { %>
-    <form action="/login" method="post">
-        <input id="username" type="text" name="username" />
-        <button type="submit"> Login </button>
-    </form>
+<a href="http://localhost:8080/register"> Register </a>
+<p></p>
+<a href="http://localhost:8080/login"> Login </a>
+
 <% } %>
-
-
