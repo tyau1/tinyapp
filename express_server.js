@@ -19,9 +19,9 @@ const users = {
 }
 
 const urlDatabase = {
-    "b2xVn2": {
+    "b2xVn2": { 
         shortURL: "b2xVn2",
-        longURL: "https://www.lighthouselabs.ca",
+        longURL: "http://www.lighthouselabs.ca",
         userID: "userID_11111"
     },
     "9sm5xK": {
@@ -145,9 +145,30 @@ app.post("/urls", (req, res) => {
     res.redirect("/urls");
 });
 
+app.get("/login", (req, res) => {
+    res.render("login");
+});
+
+app.get("/register", (req, res) => {
+        res.render("register");
+});
+
+app.post("/urls", (req, res) => {
+    const newShortURL = randomString();
+    const newLongURL = req.body.longURL;
+    var temp = {
+        shortURL: newShortURL,
+        longURL: newLongURL,
+        userID: req.session.user_id
+    }
+    urlDatabase[newShortURL] = temp;
+    res.redirect("/urls/" + newShortURL);
+});
+
 app.post("/urls/:shortURL/delete", (req, res) => {
     delete urlDatabase[req.params.shortURL];
     res.redirect("/urls");
+    
 });
 
 app.post("/urls/:shortURL", (req, res) => { // when update button is pressed
