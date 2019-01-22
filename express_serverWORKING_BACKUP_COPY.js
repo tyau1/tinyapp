@@ -17,16 +17,19 @@ const users = {
         password: "123"
     }
 }
-
+// -----OLD ----- const urlDatabase = {
+//     "b2xVn2": "http://www.lighthouselabs.ca",
+//     "9sm5xK": "http://www.google.com",
+// };
 const urlDatabase = {
-    "b2xVn2": {
+    "b2xVn2": { 
         shortURL: "b2xVn2",
-        longURL: "https://www.lighthouselabs.ca",
+        longURL: "http://www.lighthouselabs.ca",
         userID: "userID_11111"
     },
     "9sm5xK": {
         shortURL: "9sm5xK",
-        longURL: "https://www.google.com/",
+        longURL: "http://www.google.com",
         userID: "userID_22222"
     }
 }
@@ -37,7 +40,7 @@ app.use(cookieSession({
     name: 'session',
     keys: ["123"],
 
-    maxAge: 24 * 60 * 60 * 1000
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
 
 app.listen(PORT, () => {
@@ -59,35 +62,39 @@ app.get("/users.json", (req, res) => {
 app.get("/urls", (req, res) => {
     let user_id = req.session.user_id;
     let urlsForUser = getUrlsForUser(user_id);
+    console.log("URLs for user: ",urlsForUser);
+    
     const templateVars = { urls: urlsForUser, user_id: user_id, user: users[user_id] };
+    // console.log(templateVars);
     res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
     let user_id = req.session.user_id
+    // console.log(user_id);
     const templateVars = { urls: urlDatabase, user_id: user_id, user: users[user_id] };
     if (validUser(user_id)) {
         res.render("urls_new", { user: users[user_id] });
-    } else {
+      } else {
         res.redirect("/login");
     }
 });
 
-app.get("/urls/:id", (req, res) => { // edit URLS
+app.get("/urls/:id", (req, res) => {
     const shortURL = req.params.id;
     const longURL = urlDatabase[shortURL].longURL;
-    console.log("The shortURL is: ", shortURL);
-    console.log("The longURL is: ", longURL);
     const user_id = req.session.user_id
-
     let templateVars = {
         shortURL: shortURL,
         longURL: longURL,
         user: users["user_id"]
     };
-    let x = "http://" + longURL
-    res.status(301);
-    res.redirect(x);
+    res.render("urls_show", templateVars);
+});
+
+app.get("/urls/:shortURL", (req, res) => {
+    const longURL = urlDatabase[req.params.shortURL];
+    res.redirect(longURL);
 });
 
 app.get("/login", (req, res) => {
@@ -98,62 +105,29 @@ app.get("/register", (req, res) => {
     res.render("register");
 });
 
-app.get("/urls/edit/:id", (req, res) => {
-    const shortURL = req.params.id;
-    const longURL = urlDatabase[shortURL].longURL;
-    // console.log("The longURL is: ", longURL);
-    const user_id = req.session.user_id
-    let templateVars = {
-        shortURL: shortURL,
-        longURL: longURL,
-        user: users["user_id"]
-    };
-    res.render("urls_show", templateVars);
-});
-
-app.get("/u/:shortURL", (req, res) => {
-    let shortURL = req.params.shortURL;
-    let longURL = urlDatabase[shortURL].longURL;
-    console.log("This is the shortURL: ",shortURL);
-    console.log("This is the longURL: ",longURL);
-    if (shortURL) {
-        res.redirect(longURL);
-    } else {
-        res.status("404").send("Not found");
-    }
-});
-
-app.get("/", (req,res) => {
-    let user_id = req.session.user_id
-    const templateVars = { urls: urlDatabase, user_id: user_id, user: users[user_id] };
-    if (validUser(user_id)) {
-        res.redirect("/urls")
-    } else {
-        res.redirect("/login");
-    }
-});
-
-app.post("/urls", (req, res) => {
+app.post("/urls", (req, res) => { // edit urls
     const newShortURL = randomString();
     const newLongURL = req.body.longURL;
+    //follow the new structure 
     var temp = {
         shortURL: newShortURL,
         longURL: newLongURL,
         userID: req.session.user_id
     }
     urlDatabase[newShortURL] = temp;
-    res.redirect("/urls");
+    res.redirect("/urls/" + newShortURL);
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
     delete urlDatabase[req.params.shortURL];
     res.redirect("/urls");
+    
 });
 
-app.post("/urls/:shortURL", (req, res) => { // when update button is pressed
+app.post("/urls/:shortURL/", (req, res) => {
     let shortURL = req.params.shortURL;
-    urlDatabase[shortURL].longURL = req.body.longURL;
-    // console.log("this is getting triggered here: ", )
+    console.log("here's my short URL", shortURL);
+    urlDatabase[shortURL] = req.body.longURL
     res.redirect("/urls");
 });
 
@@ -170,7 +144,7 @@ app.post("/login", (req, res) => {
             req.session.user_id = user.id;
             res.redirect("/urls")
         } else {
-            res.send("Sorry the email does not exist or the password does not match!");
+            res.send("Sorry the username and password does not match in the database");
         }
     }
 });
@@ -196,6 +170,7 @@ app.post("/register", (req, res) => {
     const newEmail = req.body.email;
     const hashedPassword = bcrypt.hashSync(req.body.password, 10);
     const newUser = { id: newUserId, email: newEmail, password: hashedPassword }
+    console.log('New user: ', newUser)
     users[newUserId] = {
         id: newUserId,
         email: newEmail,
@@ -205,10 +180,11 @@ app.post("/register", (req, res) => {
     res.redirect("/urls");
 });
 
-function getUrlsForUser(userId) {
+//To get all the urls of the user who is logged in
+function getUrlsForUser(userId){
     let urlsForUser = {}
-    for (let key in urlDatabase) {
-        if (urlDatabase[key].userID === userId) {
+    for(let key in urlDatabase){
+        if(urlDatabase[key].userID === userId){
             let temp = {
                 shortURL: key,
                 longURL: urlDatabase[key].longURL
@@ -237,14 +213,29 @@ function randomUserId() {
     return result;
 }
 
-function validUser(user_id) {
+function confirmEmailPassword(email, password) {
+    for (let user_id in users) {
+        // console.log("user", user_id)
+        let user = users[user_id];
+        if (user.email === email) {
+            if (user.password === password) {
+                return user;
+            }
+            return null;
+        }
+
+    }
+    return null; // if the loop does not find an email in the db
+};
+
+function validUser (user_id) {
     return Object.keys(users).includes(user_id);
 }
 
-function authenticateUser(email, password) {
-    for (var key in users) {
-        if (users[key].email === email) {
-            if (bcrypt.compareSync(password, users[key].password)) {
+function authenticateUser(email, password){
+    for(var key in users){
+        if(users[key].email === email){
+            if(bcrypt.compareSync(password, users[key].password)){
                 return users[key];
             }
         }

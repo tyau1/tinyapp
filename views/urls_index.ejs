@@ -15,7 +15,7 @@
     Short URL: <%= key %> -  Long URL: <%= urls[key].longURL %>
     </li>
     <form action="/urls/<%= key %>/delete" method="post">
-        <a href="/urls/<%= key %>" <button> Edit </button></a>
+        <a href="/urls/edit/<%= key %>" <button> Edit </button></a>
         <button type="submit">Delete</button>
         <p></p>
     </form>
